@@ -55,6 +55,7 @@
 			<artifactId>wsdl4j</artifactId>
 		</dependency>
 
+		<!-- JAXB for XML binding -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
@@ -132,9 +133,13 @@
 						<goals>
 							<goal>xjc</goal>
 						</goals>
+						<phase>generate-sources</phase>
 					</execution>
 				</executions>
 				<configuration>
+					<packageName>com.feit.projectWS.events</packageName>
+					<bindingDirectory>${project.basedir}/src/main/resources</bindingDirectory>
+					<bindingFiles>binding.xjb</bindingFiles>
 					<sources>
 						<source>${project.basedir}/src/main/resources/xsd</source>
 					</sources>

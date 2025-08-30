@@ -3,7 +3,6 @@
            xmlns:tns="http://projectWS.feit.com/events"
            targetNamespace="http://projectWS.feit.com/events"
            elementFormDefault="qualified">
-
     <!-- Event Status Enum -->
     <xs:simpleType name="eventStatus">
         <xs:restriction base="xs:string">
@@ -166,7 +165,7 @@
     <xs:element name="getEventsByElevationGainRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="elevationGains" type="xs:int"/>
+                <xs:element name="elevationGain" type="xs:int"/>
                 <xs:element name="type" type="xs:string" default="min"/> <!-- min, max -->
             </xs:sequence>
         </xs:complexType>
