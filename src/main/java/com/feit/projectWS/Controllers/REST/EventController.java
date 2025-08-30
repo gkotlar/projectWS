@@ -205,7 +205,7 @@ public class EventController {
     @GetMapping("/search")
     public ResponseEntity<List<Event>> getEventsByLength(
             @RequestParam(name = "length") int length,
-            @RequestParam(name = "type", defaultValue = "max") String type) {
+            @RequestParam(name = "type", defaultValue = "min") String type) {
         try {
             List<Event> events = new ArrayList<Event>();
             switch (type) {
@@ -230,7 +230,7 @@ public class EventController {
     // GET /api/events/search?elevation={elevation}&type={type} - Filter by elevation gain
     @GetMapping("/search")
     public ResponseEntity<List<Event>> getEventsByElevation(
-            @RequestParam(name = "length") int elevation,
+            @RequestParam(name = "elevationGain") int elevation,
             @RequestParam(name = "type", defaultValue = "min") String type) {
         try {
             List<Event> events = new ArrayList<Event>();

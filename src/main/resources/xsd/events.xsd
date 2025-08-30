@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://projectWS.feit.com/events"
+           targetNamespace="http://projectWS.feit.com/events"
+           elementFormDefault="qualified">
+
+    <!-- Event Status Enum -->
+    <xs:simpleType name="eventStatus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="FINISHED"/>
+            <xs:enumeration value="NOTFINISHED"/>
+            <xs:enumeration value="ACTIVE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- User Type -->
+    <xs:complexType name="user">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="dateOfBirth" type="xs:date"/>
+            <xs:element name="accountActive" type="xs:boolean"/>
+            <xs:element name="createdAt" type="xs:date"/>
+            <xs:element name="updatedAt" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Event Type -->
+    <xs:complexType name="event">
+        <xs:sequence>
+            <xs:element name="id" type="xs:int"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="length" type="xs:int"/>
+            <xs:element name="elevationGain" type="xs:int"/>
+            <xs:element name="description" type="xs:string"/>
+            <xs:element name="eventStatus" type="tns:eventStatus"/>
+            <xs:element name="eventDate" type="xs:date"/>
+            <xs:element name="startLocation" type="xs:string"/>
+            <xs:element name="finishLocation" type="xs:string"/>
+            <xs:element name="createdBy" type="tns:user"/>
+            <xs:element name="participants" type="tns:userList"/>
+            <xs:element name="createdAt" type="xs:date"/>
+            <xs:element name="updatedAt" type="xs:date"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- User List Type -->
+    <xs:complexType name="userList">
+        <xs:sequence>
+            <xs:element name="user" type="tns:user" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Event List Type -->
+    <xs:complexType name="eventList">
+        <xs:sequence>
+            <xs:element name="event" type="tns:event" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Service Request/Response Messages -->
+    
+    <!-- Get All Events -->
+    <xs:element name="getAllEventsRequest">
+        <xs:complexType>
+            <xs:sequence></xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getAllEventsResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Event By ID -->
+    <xs:element name="getEventByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getEventByIdResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="event" type="tns:event"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Search Events By Name -->
+    <xs:element name="searchEventsByNameRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="name" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="searchEventsByNameResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Events By Status -->
+    <xs:element name="getEventsByStatusRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="tns:eventStatus"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getEventsByStatusResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Events By Date -->
+    <xs:element name="getEventsByDateRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="date" type="xs:date"/>
+                <xs:element name="type" type="xs:string" default="equal"/> <!-- equal, after, before -->
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getEventsByDateResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Events By Length-->
+    <xs:element name="getEventsByLengthRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="length" type="xs:int"/>
+                <xs:element name="type" type="xs:string" default="min"/> <!-- min, max -->
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getEventsByLengthResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Get Events By ElevationGain-->
+    <xs:element name="getEventsByElevationGainRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="elevationGains" type="xs:int"/>
+                <xs:element name="type" type="xs:string" default="min"/> <!-- min, max -->
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="getEventsByElevationGainResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="events" type="tns:eventList"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Service Fault -->
+    <xs:element name="serviceFault">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="code" type="xs:string"/>
+                <xs:element name="message" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
