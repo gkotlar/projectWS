@@ -138,13 +138,18 @@
 				</executions>
 				<configuration>
 					<packageName>com.feit.projectWS.events</packageName>
-					<bindingDirectory>${project.basedir}/src/main/resources</bindingDirectory>
-					<bindingFiles>binding.xjb</bindingFiles>
+					<xjbSources>
+						<xjbSource>${project.basedir}/src/main/resources/xjb</xjbSource>
+					</xjbSources>
 					<sources>
 						<source>${project.basedir}/src/main/resources/xsd</source>
 					</sources>
 					<outputDirectory>${project.basedir}/src/main/java</outputDirectory>
 					<clearOutputDir>false</clearOutputDir>
+					<arguments>
+            			<argument>-XautoNameResolution</argument>
+            			<argument>-extension</argument> <!-- Important for custom adapters -->
+					</arguments>
 				</configuration>
 			</plugin>
 		</plugins>

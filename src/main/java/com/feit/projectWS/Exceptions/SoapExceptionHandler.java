@@ -12,8 +12,8 @@ import javax.xml.namespace.QName;
  */
 public class SoapExceptionHandler extends SoapFaultMappingExceptionResolver {
     
-    private static final QName SERVICE_FAULT_CODE = new QName("SERVICE_FAULT");
-    private static final QName CLIENT_FAULT_CODE = new QName("CLIENT_FAULT");
+    // private static final QName SERVICE_FAULT_CODE = new QName("SERVICE_FAULT");
+    // private static final QName CLIENT_FAULT_CODE = new QName("CLIENT_FAULT");
     
     @Override
     protected void customizeFault(Object endpoint, Exception ex, SoapFault fault) {
@@ -27,24 +27,8 @@ public class SoapExceptionHandler extends SoapFaultMappingExceptionResolver {
     }
 }
 
-/**
- * Service-specific exceptions
- */
-class EventNotFoundException extends RuntimeException {
-    public EventNotFoundException(String message) {
-        super(message);
-    }
-}
-class UserNotFoundException extends RuntimeException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
-}
 
-class InvalidEventDataException extends RuntimeException {
-    public InvalidEventDataException(String message) {
-        super(message);
-    }
-} 
+
+
     
 

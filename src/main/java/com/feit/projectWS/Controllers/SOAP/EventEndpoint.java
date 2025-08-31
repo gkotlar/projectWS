@@ -16,14 +16,14 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import jakarta.xml.bind.DatatypeConverter;
-import jakarta.xml.bind.util.*;
 import java.sql.Date;
 import java.util.List;
+
 
 @Endpoint
 public class EventEndpoint {
     
+    private static final Date DEFAULT_DATE = Date.valueOf("1970-01-01");
     private static final String NAMESPACE_URI = "http://projectWS.feit.com/events";
     
     @Autowired
@@ -109,7 +109,7 @@ public class EventEndpoint {
         GetEventsByStatusResponse response = new GetEventsByStatusResponse();
         
         try {
-            EventStatus status = EventStatus.valueOf(request.getStatus().value());
+            EventStatus status = EventStatus.valueOf(request.getStatus().toString());
             List<Event> events = eventService.findEventsByStatus(status);
             EventList eventList = new EventList();
             
@@ -132,8 +132,7 @@ public class EventEndpoint {
         GetEventsByDateResponse response = new GetEventsByDateResponse();
         
         try {
-            // Convert XMLGregorianCalendar to SQL Date
-            Date date = new Date(request.getDate().toGregorianCalendar().getTimeInMillis());
+            Date date = Date.valueOf(request.getDate().toLocalDate());
             String type = request.getType() != null ? request.getType() : "equal";
             
             List<Event> events;
@@ -213,7 +212,7 @@ public class EventEndpoint {
         GetEventsByElevationGainResponse response = new GetEventsByElevationGainResponse();
         
         try {
-            int elevationGain = request.getElevationGains();
+            int elevationGain = request.getElevationGain();
             String type = request.getType() != null ? request.getType() : "min";
             
             if (elevationGain < 0) {
@@ -262,10 +261,10 @@ public class EventEndpoint {
         
         // Convert dates - these are now required in XSD
         if (jpaEvent.getEventDate() != null) {
-            soapEvent.setEventDate(DatatypeConverter.parseDate(jpaEvent.getEventDate().toString()));
+            soapEvent.setEventDate(jpaEvent.getEventDate());
         } else {
             // Provide default date if null
-            soapEvent.setEventDate(DatatypeConverter.parseDate("1970-01-01"));
+            soapEvent.setEventDate(DEFAULT_DATE);
         }
         
         soapEvent.setStartLocation(jpaEvent.getStartLocation() != null ? jpaEvent.getStartLocation() : "");
@@ -280,9 +279,9 @@ public class EventEndpoint {
             defaultUser.setId(0);
             defaultUser.setUsername("Unknown");
             defaultUser.setAccountActive(false);
-            defaultUser.setDateOfBirth(DatatypeConverter.parseDate("1970-01-01"));
-            defaultUser.setCreatedAt(DatatypeConverter.parseDate("1970-01-01"));
-            defaultUser.setUpdatedAt(DatatypeConverter.parseDate("1970-01-01"));
+            defaultUser.setDateOfBirth(DEFAULT_DATE);
+            defaultUser.setCreatedAt(DEFAULT_DATE);
+            defaultUser.setUpdatedAt(DEFAULT_DATE);
             soapEvent.setCreatedBy(defaultUser);
         }
         
@@ -297,15 +296,15 @@ public class EventEndpoint {
         
         // Convert timestamps - now required in XSD
         if (jpaEvent.getCreated_at() != null) {
-            soapEvent.setCreatedAt(DatatypeConverter.parseDate(jpaEvent.getCreated_at().toString()));
+            soapEvent.setCreatedAt(jpaEvent.getCreated_at());
         } else {
-            soapEvent.setCreatedAt(DatatypeConverter.parseDate("1970-01-01"));
+            soapEvent.setCreatedAt(DEFAULT_DATE);
         }
         
         if (jpaEvent.getUpdated_at() != null) {
-            soapEvent.setUpdatedAt(DatatypeConverter.parseDate(jpaEvent.getUpdated_at().toString()));
+            soapEvent.setUpdatedAt(jpaEvent.getUpdated_at());
         } else {
-            soapEvent.setUpdatedAt(DatatypeConverter.parseDate("1970-01-01"));
+            soapEvent.setUpdatedAt(DEFAULT_DATE);
         }
         
         return soapEvent;
@@ -320,21 +319,21 @@ public class EventEndpoint {
         
         // These are now required in XSD
         if (jpaUser.getDateOfBirth() != null) {
-            soapUser.setDateOfBirth(DatatypeConverter.parseDate(jpaUser.getDateOfBirth().toString()));
+            soapUser.setDateOfBirth((jpaUser.getDateOfBirth()));
         } else {
-            soapUser.setDateOfBirth(DatatypeConverter.parseDate("1970-01-01"));
+            soapUser.setDateOfBirth(DEFAULT_DATE);
         }
         
         if (jpaUser.getCreated_at() != null) {
-            soapUser.setCreatedAt(DatatypeConverter.parseDate(jpaUser.getCreated_at().toString()));
+            soapUser.setCreatedAt(jpaUser.getCreated_at());
         } else {
-            soapUser.setCreatedAt(DatatypeConverter.parseDate("1970-01-01"));
+            soapUser.setCreatedAt(DEFAULT_DATE);
         }
         
         if (jpaUser.getUpdated_at() != null) {
-            soapUser.setUpdatedAt(DatatypeConverter.parseDate(jpaUser.getUpdated_at().toString()));
+            soapUser.setUpdatedAt(jpaUser.getUpdated_at());
         } else {
-            soapUser.setUpdatedAt(DatatypeConverter.parseDate("1970-01-01"));
+            soapUser.setUpdatedAt(DEFAULT_DATE);
         }
         
         return soapUser;
