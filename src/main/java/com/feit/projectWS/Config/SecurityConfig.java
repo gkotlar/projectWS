@@ -1,6 +1,5 @@
 package com.feit.projectWS.Config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -20,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.feit.projectWS.Security.JwtAuthenticationFilter;
-import com.feit.projectWS.Security.JwtService;
 import com.feit.projectWS.Services.MyUserDetailsService;
 
 import java.util.Arrays;
