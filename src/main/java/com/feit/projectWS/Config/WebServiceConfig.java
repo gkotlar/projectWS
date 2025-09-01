@@ -36,7 +36,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
         wsdl11Definition.setPortTypeName("EventsPort");
         wsdl11Definition.setLocationUri("/ws");
-        wsdl11Definition.setTargetNamespace("http://projectWS.feit.com/events");
+        wsdl11Definition.setTargetNamespace("localhost:8080/events");
         wsdl11Definition.setSchema(eventsSchema);
         return wsdl11Definition;
     }

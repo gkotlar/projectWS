@@ -16,15 +16,15 @@ import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
 
 @Endpoint
 public class EventEndpoint {
     
-    private static final Date DEFAULT_DATE = Date.valueOf("1970-01-01");
-    private static final String NAMESPACE_URI = "http://projectWS.feit.com/events";
+    private static final Date DEFAULT_DATE = new Date(0);
+    private static final String NAMESPACE_URI = "localhost:8080/events";
     
     @Autowired
     private EventService eventService;
@@ -132,7 +132,7 @@ public class EventEndpoint {
         GetEventsByDateResponse response = new GetEventsByDateResponse();
         
         try {
-            Date date = Date.valueOf(request.getDate().toLocalDate());
+            Date date = request.getDate();
             String type = request.getType() != null ? request.getType() : "equal";
             
             List<Event> events;
@@ -280,8 +280,6 @@ public class EventEndpoint {
             defaultUser.setUsername("Unknown");
             defaultUser.setAccountActive(false);
             defaultUser.setDateOfBirth(DEFAULT_DATE);
-            defaultUser.setCreatedAt(DEFAULT_DATE);
-            defaultUser.setUpdatedAt(DEFAULT_DATE);
             soapEvent.setCreatedBy(defaultUser);
         }
         
@@ -293,19 +291,6 @@ public class EventEndpoint {
             }
         }
         soapEvent.setParticipants(userList);
-        
-        // Convert timestamps - now required in XSD
-        if (jpaEvent.getCreated_at() != null) {
-            soapEvent.setCreatedAt(jpaEvent.getCreated_at());
-        } else {
-            soapEvent.setCreatedAt(DEFAULT_DATE);
-        }
-        
-        if (jpaEvent.getUpdated_at() != null) {
-            soapEvent.setUpdatedAt(jpaEvent.getUpdated_at());
-        } else {
-            soapEvent.setUpdatedAt(DEFAULT_DATE);
-        }
         
         return soapEvent;
     }
@@ -322,18 +307,6 @@ public class EventEndpoint {
             soapUser.setDateOfBirth((jpaUser.getDateOfBirth()));
         } else {
             soapUser.setDateOfBirth(DEFAULT_DATE);
-        }
-        
-        if (jpaUser.getCreated_at() != null) {
-            soapUser.setCreatedAt(jpaUser.getCreated_at());
-        } else {
-            soapUser.setCreatedAt(DEFAULT_DATE);
-        }
-        
-        if (jpaUser.getUpdated_at() != null) {
-            soapUser.setUpdatedAt(jpaUser.getUpdated_at());
-        } else {
-            soapUser.setUpdatedAt(DEFAULT_DATE);
         }
         
         return soapUser;

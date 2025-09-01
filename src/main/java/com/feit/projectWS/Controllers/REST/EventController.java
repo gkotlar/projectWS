@@ -14,7 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,10 +61,10 @@ public class EventController {
         }
     }
 
-    // GET /api/events/createdbyuser - Get events created by user
-    @GetMapping("/owned")
+    // GET /api/events/owned/{userId} - Get events created by user
+    @GetMapping("/owned/{userId}")
     public ResponseEntity<List<Event>> getEventsByCreator(
-            @RequestAttribute(name = "userId") int userId) {
+            @PathVariable int userId) {
         try {
             if (userId <= 0) {
                 return ResponseEntity.badRequest().build();
@@ -87,9 +87,9 @@ public class EventController {
     }
 
     // GET /api/events/applied - Get events where user is a participant
-    @GetMapping("/applied")
+    @GetMapping("/applied/{userId}")
     public ResponseEntity<List<Event>> getEventsByParticipant(
-            @RequestAttribute(name = "userId")  int userId) {
+            @PathVariable int userId) {
         try {
             if (userId <= 0) {
                 return ResponseEntity.badRequest().build();
@@ -133,6 +133,7 @@ public class EventController {
             @RequestParam(name = "type", defaultValue = "equal") String type,
             @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         try {   
+            System.out.println("dasniggas");
             if (date == null || type.isEmpty() || type.isBlank()) {
                 return ResponseEntity.badRequest().build();
             }      
@@ -150,8 +151,6 @@ public class EventController {
                 default:
                     return ResponseEntity.badRequest().build();
             }
-
-            eventService.findEventsByDateAnchor(date, true);
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
@@ -281,10 +280,9 @@ public class EventController {
     // POST /api/events - Create new event
     @PostMapping
     public ResponseEntity<Event> createEvent(
-            @Validated @RequestBody EventRequestDTO eventDTO,
-            @RequestAttribute("userId") int userId) {
+            @Validated @RequestBody EventRequestDTO eventDTO) {
         try {
-            User creator = userService.findUserById(userId);
+            User creator = userService.findUserById(eventDTO.getUserId());
             if (creator == null) {
                 return ResponseEntity.notFound().build();
             }
@@ -309,11 +307,9 @@ public class EventController {
 
     // PUT /api/events/{id} - Update existing event
     @PutMapping("/{id}")
-    @PreAuthorize("@eventService.findEventById(#id).createdBy.id == authentication.principal.userId")
     public ResponseEntity<Event> updateEvent(
             @PathVariable int id, 
-            @Validated @RequestBody EventRequestDTO eventDTO,
-            @RequestAttribute("userId") int userId) {
+            @Validated @RequestBody EventRequestDTO eventDTO) {
         try {
             Event existingEvent = eventService.findEventById(id);
             if (existingEvent == null) {
@@ -321,7 +317,7 @@ public class EventController {
             }
 
             // Check if user is the creator
-            if (existingEvent.getCreatedBy().getId() != userId) {
+            if (existingEvent.getCreatedBy().getId() != eventDTO.getUserId()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             
@@ -342,10 +338,10 @@ public class EventController {
     }
 
     // DELETE /api/events/{id} - Delete event
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}/{userId}")
     public ResponseEntity<Void> deleteEvent(
             @PathVariable int id,
-            @RequestAttribute("userId") int userId) {
+            @PathVariable int userId) {
         try {
             Event existingEvent = eventService.findEventById(id);
             if (existingEvent == null) {
@@ -365,10 +361,10 @@ public class EventController {
     }
 
     // POST /api/events/{id}/join/{userId} - Join event as participant
-    @PostMapping("/{id}/join")
+    @PostMapping("/{id}/join/{userId}")
     public ResponseEntity<Event> joinEvent(
             @PathVariable int id, 
-            @RequestAttribute("userId") int userId) {
+            @PathVariable int userId) {
         try {
             Event event = eventService.findEventById(id);
             User user = userService.findUserById(userId);
@@ -397,10 +393,10 @@ public class EventController {
     }
 
     // DELETE /api/events/{id}/leave/{userId} - Leave event as participant
-    @DeleteMapping("/{id}/leave")
+    @DeleteMapping("/{id}/leave/{userId}")
     public ResponseEntity<Event> leaveEvent(
             @PathVariable int id, 
-            @RequestAttribute("userId") int userId) {
+            @PathVariable int userId) {
         try {
             Event event = eventService.findEventById(id);
             User user = userService.findUserById(userId);

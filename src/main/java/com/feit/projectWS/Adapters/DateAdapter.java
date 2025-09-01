@@ -1,7 +1,7 @@
 package com.feit.projectWS.Adapters;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import java.sql.Date;
+import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "*") // Configure properly for production
+@CrossOrigin(origins = "*")
 public class UserController {
 
     @Autowired
@@ -28,7 +28,6 @@ public class UserController {
 
     // GET /api/users - Get all users with pagination
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         try {
             List<User> users = userService.findAllUsers();
@@ -46,10 +45,10 @@ public class UserController {
         }
     }
 
-    //GET api/users/profile - get your profile
-    @GetMapping("/profile")
+    //GET api/users/profile/{userId} - get your profile
+    @GetMapping("/profile/{userId}")
     public ResponseEntity<UserResponseDTO> getCurrentUserProfile(
-            @RequestAttribute("userId") int userId) {
+            @PathVariable int userId) {
         try {
             User user = userService.findUserById(userId);
             if (user == null) {
@@ -91,9 +90,9 @@ public class UserController {
     }
 
     // PUT /api/users/{id} - Update existing user
-    @PutMapping("/profile")
+    @PutMapping("/{userId}")
     public ResponseEntity<UserResponseDTO> updateCurrentUser(
-            @RequestAttribute("userId") int userId,
+            @PathVariable("userId") int userId,
             @Validated @RequestBody UpdateUserDTO updateUserDTO) {
         try {
             User existingUser = userService.findUserById(userId);
@@ -117,8 +116,8 @@ public class UserController {
     }
 
     // DELETE /api/users/{id} - Delete user
-    @DeleteMapping("/profile")
-    public ResponseEntity<Void> deleteCurrentUser(@RequestAttribute("userId") int userId) {
+    @DeleteMapping("/profile/{userId}")
+    public ResponseEntity<Void> deleteCurrentUser(@PathVariable int userId) {
         try {
             User existingUser = userService.findUserById(userId);
             if (existingUser == null) {

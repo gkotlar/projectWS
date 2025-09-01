@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:tns="http://projectWS.feit.com/events"
-           targetNamespace="http://projectWS.feit.com/events"
+           xmlns:tns="localhost:8080/events"
+           targetNamespace="localhost:8080/events"
            elementFormDefault="qualified">
     <!-- Event Status Enum -->
     <xs:simpleType name="eventStatus">

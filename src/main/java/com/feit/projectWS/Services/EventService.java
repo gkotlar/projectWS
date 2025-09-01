@@ -1,6 +1,6 @@
 package com.feit.projectWS.Services;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +55,7 @@ public class EventService {
         return events;
     }
     public List<Event> findEventsByDate(Date date){
-        List<Event> events = eventRepository.findByEventDate(date);
+        List<Event> events = eventRepository.findByEventDate(new java.sql.Date(date.getTime()));
         return events;
     }
 
@@ -79,9 +79,9 @@ public class EventService {
          */
         List<Event> events = new ArrayList<Event>();
         if (isAfterBoolean){
-            events = eventRepository.findByEventDateAfter(date);
+            events = eventRepository.findByEventDateAfter(new java.sql.Date(date.getTime()));
         }else{
-            events = eventRepository.findByEventDateBefore(date);
+            events = eventRepository.findByEventDateBefore(new java.sql.Date(date.getTime()));
         }
         return events;
     }

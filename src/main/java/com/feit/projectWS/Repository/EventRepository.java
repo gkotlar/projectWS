@@ -20,7 +20,8 @@ public interface EventRepository extends JpaRepository <Event, Integer> {
 
     List<Event> findByEventStatus (EventStatus status);
 
-    List<Event> findByEventDate (Date date);
+    @Query("SELECT e FROM Event e WHERE DATE(e.eventDate) = :date")
+    List<Event> findByEventDate (@Param("date") Date date);
     List<Event> findByEventDateAfter (Date date);
     List<Event> findByEventDateBefore (Date date);
     List<Event> findByEventDateGreaterThanEqual (Date date);

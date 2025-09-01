@@ -3,7 +3,7 @@ package com.feit.projectWS.DTOs;
 import com.feit.projectWS.Models.enums.EventStatus;
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import java.sql.Date;
+import java.util.Date;
 
 @Data
 public class EventRequestDTO {
@@ -33,4 +33,6 @@ public class EventRequestDTO {
     @NotBlank(message = "Finish location is required")
     @Size(max = 255, message = "Finish location cannot exceed 255 characters")
     private String finishLocation;
+
+    private int userId;
 }

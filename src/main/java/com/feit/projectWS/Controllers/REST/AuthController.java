@@ -4,7 +4,6 @@ import com.feit.projectWS.DTOs.CreateUserDTO;
 import com.feit.projectWS.DTOs.LoginDTO;
 import com.feit.projectWS.DTOs.UserResponseDTO;
 import com.feit.projectWS.Models.User;
-import com.feit.projectWS.Security.JwtUtil;
 import com.feit.projectWS.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
@@ -28,24 +30,17 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtil jwtTokenUtil;
-
-    @Autowired
     private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Validated @RequestBody LoginDTO loginDTO) {
         try {
-            authenticate(loginDTO.getUsername(), loginDTO.getPassword());
-            
-            User user = userService.findUserByName(loginDTO.getUsername());
+            User user = userService.authenticateUser(loginDTO.getUsername(), loginDTO.getPassword());
             if (user == null || !user.isAccountActive()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
-            final String token = jwtTokenUtil.generateToken(user.getUsername(), user.getId());
-
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
+         //   response.put("token", token);
             response.put("user", new UserResponseDTO(user));
 
             return ResponseEntity.ok(response);
@@ -57,6 +52,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid credentials"));
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Authentication failed"));
         }
@@ -83,6 +79,7 @@ public class AuthController {
                     .body(new UserResponseDTO(savedUser));
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Registration failed"));
         }
@@ -90,8 +87,11 @@ public class AuthController {
 
     private void authenticate(String username, String password) throws Exception {
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password));
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+            Authentication auth = authenticationManager.authenticate(token);
+            SecurityContext sc = SecurityContextHolder.getContext();
+            sc.setAuthentication(auth);
+            System.out.println(auth.getPrincipal());
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {

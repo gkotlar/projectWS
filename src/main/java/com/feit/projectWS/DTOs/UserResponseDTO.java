@@ -1,7 +1,7 @@
 package com.feit.projectWS.DTOs;
 
 import lombok.Data;
-import java.sql.Date;
+import java.util.Date;
 
 // DTO for returning user data (excludes password)
 @Data

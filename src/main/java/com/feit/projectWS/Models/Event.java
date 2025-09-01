@@ -2,8 +2,8 @@ package com.feit.projectWS.Models;
 
 import lombok.Data;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,7 +31,7 @@ public class Event {
     @Column(name = "elevationGain")
     private int elevationGain;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 1500)
     private String description;
     
     @Enumerated(EnumType.STRING)
@@ -51,7 +51,7 @@ public class Event {
     @JoinColumn(name = "user_id")
     private User createdBy;
 
-    @ManyToMany (fetch = FetchType.LAZY)
+    @ManyToMany (fetch = FetchType.EAGER)
     @JoinTable(
         name = "participants",
         joinColumns = @JoinColumn(name = "event_id"),
