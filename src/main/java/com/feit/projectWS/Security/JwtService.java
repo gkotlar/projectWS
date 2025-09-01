@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 @Service
 public class JwtService {
 
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    private final SecretKey key = Keys.hmacShaKeyFor("f9217abb37b7fbde3ec155ed3b31ef76fcc46f3421f4c7229e0e5d2cf64171e9".getBytes());
     private final long expirationMs = 3600000; // 1 hour
 
     public String generateToken(Authentication auth) {
@@ -24,15 +26,23 @@ public class JwtService {
     }
 
     public String extractUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
-                .parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
     }
+
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token);
             return true;
-        } catch (JwtException e) {
+        } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
