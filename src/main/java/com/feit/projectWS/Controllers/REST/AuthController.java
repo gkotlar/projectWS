@@ -4,6 +4,7 @@ import com.feit.projectWS.DTOs.CreateUserDTO;
 import com.feit.projectWS.DTOs.LoginDTO;
 import com.feit.projectWS.DTOs.UserResponseDTO;
 import com.feit.projectWS.Models.User;
+import com.feit.projectWS.Security.JwtService;
 import com.feit.projectWS.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,16 +33,20 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private JwtService jwtService;
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Validated @RequestBody LoginDTO loginDTO) {
         try {
-            User user = userService.authenticateUser(loginDTO.getUsername(), loginDTO.getPassword());
+            User user = userService.findUserByName(loginDTO.getUsername());
             if (user == null || !user.isAccountActive()) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
+
+            String token = authenticate(loginDTO.getUsername(), loginDTO.getPassword());
             Map<String, Object> response = new HashMap<>();
-         //   response.put("token", token);
-            response.put("user", new UserResponseDTO(user));
+            response.put("token", token);
 
             return ResponseEntity.ok(response);
 
@@ -85,13 +90,12 @@ public class AuthController {
         }
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private String authenticate(String username, String password) throws Exception {
         try {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
             Authentication auth = authenticationManager.authenticate(token);
-            SecurityContext sc = SecurityContextHolder.getContext();
-            sc.setAuthentication(auth);
-            System.out.println(auth.getPrincipal());
+            String jwt = jwtService.generateToken(auth);
+            return jwt;
         } catch (DisabledException e) {
             throw new Exception("USER_DISABLED", e);
         } catch (BadCredentialsException e) {
