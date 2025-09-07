@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
@@ -16,6 +18,7 @@ public class JwtService {
     private final long expirationMs = 3600000; // 1 hour
 
     public String generateToken(Authentication auth) {
+ 
         return Jwts.builder()
                 .setSubject(auth.getName())
                 .setIssuedAt(new Date())

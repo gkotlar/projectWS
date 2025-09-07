@@ -45,6 +45,7 @@ public class AuthController {
             String token = authenticate(loginDTO.getUsername(), loginDTO.getPassword());
             Map<String, Object> response = new HashMap<>();
             response.put("token", token);
+            response.put("userId", user.getId());
 
             return ResponseEntity.ok(response);
 

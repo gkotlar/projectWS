@@ -109,7 +109,7 @@ public class EventService {
         return events;
     }
     public List<Event> findEventsByMaxElevationGain(int elevationGain){
-        List<Event> events = eventRepository.findByElevationGainLessThanEqual(elevationGain);
+        List<Event> events = eventRepository.findByElevationGainLessThan(elevationGain);
         return events;
     }
 

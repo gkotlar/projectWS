@@ -3,6 +3,7 @@
            xmlns:tns="localhost:8080/events"
            targetNamespace="localhost:8080/events"
            elementFormDefault="qualified">
+    
     <!-- Event Status Enum -->
     <xs:simpleType name="eventStatus">
         <xs:restriction base="xs:string">
@@ -12,15 +13,40 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <!-- Length Type Enum for filtering -->
+    <xs:simpleType name="lengthType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="min"/>
+            <xs:enumeration value="max"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Date Type Enum for filtering -->
+    <xs:simpleType name="dateType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="equal"/>
+            <xs:enumeration value="after"/>
+            <xs:enumeration value="before"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Elevation Type Enum for filtering -->
+    <xs:simpleType name="elevationType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="min"/>
+            <xs:enumeration value="max"/>
+        </xs:restriction>
+    </xs:simpleType>
+
     <!-- User Type -->
     <xs:complexType name="user">
         <xs:sequence>
             <xs:element name="id" type="xs:int"/>
             <xs:element name="username" type="xs:string"/>
-            <xs:element name="dateOfBirth" type="xs:date"/>
+            <xs:element name="dateOfBirth" type="xs:date" minOccurs="0"/>
             <xs:element name="accountActive" type="xs:boolean"/>
-            <xs:element name="createdAt" type="xs:date"/>
-            <xs:element name="updatedAt" type="xs:date"/>
+            <xs:element name="createdAt" type="xs:date" minOccurs="0"/>
+            <xs:element name="updatedAt" type="xs:date" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -38,8 +64,8 @@
             <xs:element name="finishLocation" type="xs:string"/>
             <xs:element name="createdBy" type="tns:user"/>
             <xs:element name="participants" type="tns:userList"/>
-            <xs:element name="createdAt" type="xs:date"/>
-            <xs:element name="updatedAt" type="xs:date"/>
+            <xs:element name="createdAt" type="xs:date" minOccurs="0"/>
+            <xs:element name="updatedAt" type="xs:date" minOccurs="0"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -130,7 +156,7 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="date" type="xs:date"/>
-                <xs:element name="type" type="xs:string" default="equal"/> <!-- equal, after, before -->
+                <xs:element name="type" type="tns:dateType" default="equal"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -143,12 +169,12 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- Get Events By Length-->
+    <!-- Get Events By Length -->
     <xs:element name="getEventsByLengthRequest">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="length" type="xs:int"/>
-                <xs:element name="type" type="xs:string" default="min"/> <!-- min, max -->
+                <xs:element name="type" type="tns:lengthType" default="min"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -161,12 +187,12 @@
         </xs:complexType>
     </xs:element>
 
-    <!-- Get Events By ElevationGain-->
+    <!-- Get Events By ElevationGain -->
     <xs:element name="getEventsByElevationGainRequest">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="elevationGain" type="xs:int"/>
-                <xs:element name="type" type="xs:string" default="min"/> <!-- min, max -->
+                <xs:element name="type" type="tns:elevationType" default="min"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

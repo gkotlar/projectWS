@@ -9,38 +9,49 @@
 package com.feit.projectWS.events;
 
 import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for eventStatus.
+ * <p>Java class for lengthType.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <pre>
- * &lt;simpleType name="eventStatus"&gt;
+ * &lt;simpleType name="lengthType"&gt;
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *     &lt;enumeration value="FINISHED"/&gt;
- *     &lt;enumeration value="NOTFINISHED"/&gt;
- *     &lt;enumeration value="ACTIVE"/&gt;
+ *     &lt;enumeration value="min"/&gt;
+ *     &lt;enumeration value="max"/&gt;
  *   &lt;/restriction&gt;
  * &lt;/simpleType&gt;
  * </pre>
  * 
  */
-@XmlType(name = "eventStatus")
+@XmlType(name = "lengthType")
 @XmlEnum
-public enum EventStatus {
+public enum LengthType {
 
-    FINISHED,
-    NOTFINISHED,
-    ACTIVE;
+    @XmlEnumValue("min")
+    MIN("min"),
+    @XmlEnumValue("max")
+    MAX("max");
+    private final String value;
 
-    public String value() {
-        return name();
+    LengthType(String v) {
+        value = v;
     }
 
-    public static EventStatus fromValue(String v) {
-        return valueOf(v);
+    public String value() {
+        return value;
+    }
+
+    public static LengthType fromValue(String v) {
+        for (LengthType c: LengthType.values()) {
+            if (c.value.equals(v)) {
+                return c;
+            }
+        }
+        throw new IllegalArgumentException(v);
     }
 
 }

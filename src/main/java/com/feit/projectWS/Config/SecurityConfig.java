@@ -66,7 +66,7 @@ public class SecurityConfig {
                 .requestMatchers("/events/**").authenticated()
                 
                 // WSDL access - publicly accessible for service discovery
-                .requestMatchers("/ws/*.wsdl").permitAll()
+                .requestMatchers("/ws/events.wsdl").permitAll()
                 .requestMatchers("/ws/**").authenticated()
                 
                 // All other REST endpoints require authentication

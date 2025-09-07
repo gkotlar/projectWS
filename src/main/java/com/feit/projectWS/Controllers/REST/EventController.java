@@ -1,21 +1,33 @@
 package com.feit.projectWS.Controllers.REST;
 
-import com.feit.projectWS.DTOs.EventRequestDTO;
-import com.feit.projectWS.Models.Event;
-import com.feit.projectWS.Models.User;
-import com.feit.projectWS.Models.enums.EventStatus;
-import com.feit.projectWS.Services.EventService;
-import com.feit.projectWS.Services.UserService;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
+import com.feit.projectWS.DTOs.EventRequestDTO;
+import com.feit.projectWS.DTOs.EventResponseDTO;
+import com.feit.projectWS.Models.Event;
+import com.feit.projectWS.Models.User;
+import com.feit.projectWS.Models.enums.EventStatus;
+import com.feit.projectWS.Services.EventService;
+import com.feit.projectWS.Services.UserService;
 
 @RestController
 @RequestMapping("/api/events")
@@ -30,13 +42,17 @@ public class EventController {
 
     // GET /api/events - Get all events
     @GetMapping
-    public ResponseEntity<List<Event>> getAllEvents() {
+    public ResponseEntity<List<EventResponseDTO>> getAllEvents() {
         try {
             List<Event> events = eventService.findAllEvents();
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -44,7 +60,7 @@ public class EventController {
 
     // GET /api/events/{id} - Get event by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Event> getEventById(
+    public ResponseEntity<EventResponseDTO> getEventById(
             @PathVariable int id) {
         try {
             if (id <= 0) {
@@ -54,7 +70,7 @@ public class EventController {
             if (event == null) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(event);
+            return ResponseEntity.ok(new EventResponseDTO(event));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -62,7 +78,7 @@ public class EventController {
 
     // GET /api/events/owned/{userId} - Get events created by user
     @GetMapping("/owned/{userId}")
-    public ResponseEntity<List<Event>> getEventsByCreator(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByCreator(
             @PathVariable int userId) {
         try {
             if (userId <= 0) {
@@ -78,7 +94,11 @@ public class EventController {
                 return ResponseEntity.noContent().build();
             }
 
-            return ResponseEntity.ok(events);
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -87,7 +107,7 @@ public class EventController {
 
     // GET /api/events/applied - Get events where user is a participant
     @GetMapping("/applied/{userId}")
-    public ResponseEntity<List<Event>> getEventsByParticipant(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByParticipant(
             @PathVariable int userId) {
         try {
             if (userId <= 0) {
@@ -102,7 +122,12 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+
+            List<EventResponseDTO> eventsDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventsDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -110,7 +135,7 @@ public class EventController {
 
     // GET /api/events/search/name?name={name} - Search events by name
     @GetMapping("/search/name")
-    public ResponseEntity<List<Event>> searchEventsByName(
+    public ResponseEntity<List<EventResponseDTO>> searchEventsByName(
             @RequestParam(name = "name") String name) {
         try {
             if (name == null || name.isBlank()) {
@@ -120,7 +145,11 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -128,11 +157,10 @@ public class EventController {
 
     // GET /api/events/search/date?date={date}&type={type} - Get events for date
     @GetMapping("/search/date")
-    public ResponseEntity<List<Event>> getEventsByDate(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByDate(
             @RequestParam(name = "type", defaultValue = "equal") String type,
             @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
         try {   
-            System.out.println("dasniggas");
             if (date == null || type.isEmpty() || type.isBlank()) {
                 return ResponseEntity.badRequest().build();
             }      
@@ -153,7 +181,12 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -161,7 +194,7 @@ public class EventController {
 
     // GET /api/events/search/status?status={status} - filter events by status
     @GetMapping("/search/status")
-    public ResponseEntity<List<Event>> getEventsByStatus(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByStatus(
             @RequestParam(name = "status") String tmpStatus) {
         try {       
             if(tmpStatus.isEmpty() || tmpStatus.isBlank()){
@@ -180,7 +213,11 @@ public class EventController {
                 return ResponseEntity.noContent().build();
             }
 
-            return ResponseEntity.ok(events);
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -188,7 +225,7 @@ public class EventController {
 
     // GET /api/events/search/participants?participants={number}&type={type} - Filter by participant count
     @GetMapping("/search/participants")
-    public ResponseEntity<List<Event>> getEventsByParticipantCount(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByParticipantCount(
             @RequestParam(name = "minparticipants") int count,
             @RequestParam(name = "type", defaultValue = "equal") String type) {
         try {
@@ -212,7 +249,12 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -220,7 +262,7 @@ public class EventController {
 
     // GET /api/events/search?length={length}&type={type} - Filter by length
     @GetMapping("/search/length")
-    public ResponseEntity<List<Event>> getEventsByLength(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByLength(
             @RequestParam(name = "length") int length,
             @RequestParam(name = "type", defaultValue = "min") String type) {
         try {
@@ -230,7 +272,7 @@ public class EventController {
             List<Event> events = new ArrayList<Event>();
             switch (type.toLowerCase().trim()) {
                 case "min":
-                    events = eventService.findEventsByMaxLength(length);
+                    events = eventService.findEventsByMinLength(length);
                     break;
                 case "max":
                     events = eventService.findEventsByMaxLength(length);
@@ -241,7 +283,12 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -249,9 +296,9 @@ public class EventController {
 
     // GET /api/events/search?elevation={elevation}&type={type} - Filter by elevation gain
     @GetMapping("/search/elevation")
-    public ResponseEntity<List<Event>> getEventsByElevation(
+    public ResponseEntity<List<EventResponseDTO>> getEventsByElevation(
             @RequestParam(name = "elevationGain") int elevation,
-            @RequestParam(name = "type", defaultValue = "min") String type) {
+            @RequestParam(name = "type") String type) {
         try {
             if (elevation < 0 || type.isEmpty() || type.isBlank()) {
                 return ResponseEntity.badRequest().build();
@@ -259,10 +306,10 @@ public class EventController {
             List<Event> events = new ArrayList<Event>();
             switch (type.toLowerCase().trim()) {
                 case "min":
-                    events = eventService.findEventsByMaxElevationGain(elevation);
+                    events = eventService.findEventsByMinElevationGain(elevation);
                     break;
                 case "max":
-                    events = eventService.findEventsByMinElevationGain(elevation);
+                    events = eventService.findEventsByMaxElevationGain(elevation);
                     break;
                 default:
                     return ResponseEntity.badRequest().build();
@@ -270,7 +317,12 @@ public class EventController {
             if (events.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(events);
+
+            List<EventResponseDTO> eventDTOs = events.stream()
+                .map(EventResponseDTO::new)
+                .collect(Collectors.toList());
+
+            return ResponseEntity.ok(eventDTOs);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -278,7 +330,7 @@ public class EventController {
 
     // POST /api/events - Create new event
     @PostMapping
-    public ResponseEntity<Event> createEvent(
+    public ResponseEntity<EventResponseDTO> createEvent(
             @Validated @RequestBody EventRequestDTO eventDTO) {
         try {
             User creator = userService.findUserById(eventDTO.getUserId());
@@ -298,7 +350,7 @@ public class EventController {
             event.setCreatedBy(creator);
 
             Event savedEvent = eventService.saveEvent(event);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedEvent);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new EventResponseDTO(savedEvent));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -306,7 +358,7 @@ public class EventController {
 
     // PUT /api/events/{id} - Update existing event
     @PutMapping("/{id}")
-    public ResponseEntity<Event> updateEvent(
+    public ResponseEntity<EventResponseDTO> updateEvent(
             @PathVariable int id, 
             @Validated @RequestBody EventRequestDTO eventDTO) {
         try {
@@ -330,7 +382,7 @@ public class EventController {
             existingEvent.setFinishLocation(eventDTO.getFinishLocation());
 
             Event updatedEvent = eventService.saveEvent(existingEvent);
-            return ResponseEntity.ok(updatedEvent);
+            return ResponseEntity.ok(new EventResponseDTO(updatedEvent));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -361,7 +413,7 @@ public class EventController {
 
     // POST /api/events/{id}/join/{userId} - Join event as participant
     @PostMapping("/{id}/join/{userId}")
-    public ResponseEntity<Event> joinEvent(
+    public ResponseEntity<EventResponseDTO> joinEvent(
             @PathVariable int id, 
             @PathVariable int userId) {
         try {
@@ -385,15 +437,15 @@ public class EventController {
             
             event.getParticipants().add(user);
             Event updatedEvent = eventService.saveEvent(event);
-            return ResponseEntity.ok(updatedEvent);
+            return ResponseEntity.ok(new EventResponseDTO(updatedEvent));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    // DELETE /api/events/{id}/leave/{userId} - Leave event as participant
-    @DeleteMapping("/{id}/leave/{userId}")
-    public ResponseEntity<Event> leaveEvent(
+    // POST /api/events/{id}/leave/{userId} - Leave event as participant
+    @PostMapping("/{id}/leave/{userId}")
+    public ResponseEntity<EventResponseDTO> leaveEvent(
             @PathVariable int id, 
             @PathVariable int userId) {
         try {
@@ -413,7 +465,7 @@ public class EventController {
             }
             
             Event updatedEvent = eventService.saveEvent(event);
-            return ResponseEntity.ok(updatedEvent);
+            return ResponseEntity.ok(new EventResponseDTO(updatedEvent));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

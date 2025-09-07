@@ -87,7 +87,7 @@ public class EventEndpoint {
         SearchEventsByNameResponse response = new SearchEventsByNameResponse();
         
         try {
-            List<Event> events = eventService.findEventsByName(request.getName());
+            List<Event> events = eventService.findEventsByName(request.getName().trim());
             EventList eventList = new EventList();
             
             for (Event event : events) {
@@ -109,7 +109,7 @@ public class EventEndpoint {
         GetEventsByStatusResponse response = new GetEventsByStatusResponse();
         
         try {
-            EventStatus status = EventStatus.valueOf(request.getStatus().toString());
+            EventStatus status = EventStatus.valueOf(request.getStatus().toString().toUpperCase().trim());
             List<Event> events = eventService.findEventsByStatus(status);
             EventList eventList = new EventList();
             
@@ -133,10 +133,10 @@ public class EventEndpoint {
         
         try {
             Date date = request.getDate();
-            String type = request.getType() != null ? request.getType() : "equal";
+            String type = request.getType() != null ? request.getType().toString().toLowerCase().trim() : "equal";
             
             List<Event> events;
-            switch (type.toLowerCase()) {
+            switch (type) {
                 case "equal":
                     events = eventService.findEventsByDate(date);
                     break;
@@ -172,14 +172,14 @@ public class EventEndpoint {
         
         try {
             int length = request.getLength();
-            String type = request.getType() != null ? request.getType() : "min";
+            String type = request.getType() != null ? request.getType().toString().toLowerCase().trim() : "min";
             
             if (length < 0) {
                 throw new IllegalArgumentException("Length must be non-negative");
             }
             
             List<Event> events;
-            switch (type.toLowerCase()) {
+            switch (type) {
                 case "min":
                     events = eventService.findEventsByMinLength(length);
                     break;
@@ -213,14 +213,14 @@ public class EventEndpoint {
         
         try {
             int elevationGain = request.getElevationGain();
-            String type = request.getType() != null ? request.getType() : "min";
+            String type = request.getType() != null ? request.getType().toString().toLowerCase().trim() : "min";
             
             if (elevationGain < 0) {
                 throw new IllegalArgumentException("Elevation gain must be non-negative");
             }
             
             List<Event> events;
-            switch (type.toLowerCase()) {
+            switch (type) {
                 case "min":
                     events = eventService.findEventsByMinElevationGain(elevationGain);
                     break;
